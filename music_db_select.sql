@@ -62,7 +62,7 @@ WHERE a.name NOT IN (
     FROM artists a2
     JOIN artists_albums aa ON a2.artists_id = aa.artists_id
     JOIN albums al ON aa.albums_id = al.albums_id
-    WHERE al.release_year != 2020
+    WHERE al.release_year = 2020
 );
 
 --Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами).
