@@ -57,7 +57,22 @@ INSERT INTO collections_tracks (collections_id, tracks_id) VALUES
     (3, 4),  
     (3, 5),
 	(3, 6),
-	(4, 7);  
+	(4, 7);
+
+INSERT INTO tracks (albums_id, title, duration) 
+VALUES 
+    (1, 'mysels', 150),
+    (1, 'by myself', 215),
+    (1, 'bemy self', 270),
+    (2, 'myself by', 245),
+    (2, 'by myself by', 210),
+    (3, 'beemy', 194),
+    (4, 'premyne', 281),
+    (4, 'Звезда', 274),
+    (1, 'my own', 150),
+    (1, 'own my', 190),
+    (1, 'my', 150),
+    (2, 'oh my god', 214);
     
     
     
