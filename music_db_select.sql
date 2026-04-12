@@ -8,7 +8,7 @@ WHERE duration = (SELECT MAX(duration) FROM tracks);
 
 SELECT t.title, t.duration
 FROM tracks t
-WHERE duration > 210;
+WHERE duration >= 210;
 
 --Названия сборников, вышедших в период с 2018 по 2020 год включительно.
 
@@ -26,7 +26,10 @@ WHERE a.name NOT LIKE '% %';
 
 SELECT t.title 
 FROM tracks t 
-WHERE t.title LIKE '%My%';
+WHERE t.title ILIKE 'my %' 
+OR t.title ILIKE '% my'
+OR t.title ILIKE '% my %'
+OR t.title ILIKE 'my';
 
 --Количество исполнителей в каждом жанре.
 
@@ -52,11 +55,15 @@ GROUP BY a.albums_id, a.title;
 
 --Все исполнители, которые не выпустили альбомы в 2020 году.
 
-SELECT DISTINCT a.name   
-FROM artists a 
-JOIN artists_albums aa ON a.artists_id = aa.artists_id 
-JOIN albums a2 ON aa.albums_id = a2.albums_id
-WHERE a2.release_year != 2020;
+SELECT DISTINCT a.name
+FROM artists a
+WHERE a.name NOT IN (
+    SELECT DISTINCT a2.name
+    FROM artists a2
+    JOIN artists_albums aa ON a2.artists_id = aa.artists_id
+    JOIN albums al ON aa.albums_id = al.albums_id
+    WHERE al.release_year != 2020
+);
 
 --Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами).
 
@@ -92,13 +99,11 @@ WHERE ct.tracks_id IS NULL;
 --— теоретически таких треков может быть несколько.
 
 SELECT a.name, t.duration
-FROM artists a 
-JOIN artists_albums aa ON a.artists_id = aa.artists_id  
-JOIN tracks t ON aa.albums_id = t.albums_id 
-GROUP BY a.name, t.duration 
-HAVING t.duration = MIN(t.duration)
-ORDER BY t.duration
-LIMIT 3;
+FROM artists a
+JOIN artists_albums aa ON a.artists_id = aa.artists_id
+JOIN tracks t ON aa.albums_id = t.albums_id
+WHERE t.duration = (SELECT MIN(duration) FROM tracks)
+ORDER BY t.duration;
 
 --Названия альбомов, содержащих наименьшее количество треков.
 
@@ -106,8 +111,14 @@ SELECT a.title, COUNT(t.tracks_id) AS track_count
 FROM albums a
 JOIN tracks t ON a.albums_id = t.albums_id
 GROUP BY a.albums_id, a.title
-ORDER BY track_count
-LIMIT 2;
+HAVING COUNT(t.tracks_id) = (
+    SELECT MIN(track_count)
+    FROM (
+        SELECT COUNT(*) AS track_count
+        FROM tracks
+        GROUP BY albums_id
+    ) AS counts
+);
 
 
 
